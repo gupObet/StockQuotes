@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">StockQuotes</string>
+    <string name="search_hint">Enter symbol or company name:</string>
+</resources>
