@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jamiewong on 3/21/17.
@@ -17,9 +18,10 @@ class QuotesAdapter extends BaseAdapter {
 
 
     private final LayoutInflater quotesInflator;
-    private final ArrayList<ResponseQuotes> quotesList;
+    private final List<ResponseQuotes> quotesList;
+    //private final ArrayList<ResponseQuotes> quotesList;
 
-    public QuotesAdapter(Context context, ArrayList<ResponseQuotes> retQuotesList) {
+    public QuotesAdapter(Context context, List<ResponseQuotes> retQuotesList) {
         quotesList=retQuotesList;
         quotesInflator = LayoutInflater.from(context);
     }
