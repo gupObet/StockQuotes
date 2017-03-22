@@ -4,6 +4,9 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -23,6 +26,7 @@ import java.util.ArrayList;
  * Todo:  Add check for network state, before making http request
  * check for errors, ex: retSymbolList is ever null
  * questions: repeat quote symbols
+ * fix the 501 case, for ex. GERN for loolup GE, string cannot be converted to jsonObject
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private StringBuilder stringBuilder;
     private ArrayList<String> retSymbolList;
     private ArrayList<String> retQuoteUrls;
+    private ListView listViewQuotes;
+    private ProgressBar progBar;
 
     //private android.support.v7.widget.SearchView.SearchAutoComplete searchView;
 
@@ -51,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.search_view);*/
 
         searchView= (SearchView) findViewById(R.id.search_view);
+        listViewQuotes = (ListView) findViewById(R.id.lv_quotes);
+        progBar = (ProgressBar) findViewById(R.id.progBar);
 
     }
 
@@ -201,19 +209,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progBar.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
         protected ArrayList<String> doInBackground(Object... voids) {
 
             ArrayList<String> quoteResponses = new ArrayList<>();
 
             for(int i=0; i<quoteUrls.size(); i++){
 
+                String responseString=connect(quoteUrls.get(i));
+
+
                 try {
-                    Thread.sleep(6000);  //5000 would still have some 501 response codes which is a failure
+                    Thread.sleep(1000);  //5000 would still have some 501 response codes which is a failure
                 } catch (InterruptedException exception) {
                     exception.printStackTrace();
                 }
-
-                String responseString=connect(quoteUrls.get(i));
 
                 quoteResponses.add(responseString);
             }
@@ -229,54 +246,140 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("QuoteAsyncTask", "response " + i + ": " + quoteResponses.get(i));
             }
 
-            parseJsonQuote(quoteResponses);
+            ArrayList<String> jsonFormQuoteResponses = putInJsonFormat(quoteResponses);
+            ArrayList<ResponseQuotes> retQuotesList = parseJsonQuote(jsonFormQuoteResponses);
+            displayQuotesListView(retQuotesList);
+            progBar.setVisibility(View.GONE);
         }
 
-        private void parseJsonQuote(ArrayList<String> quoteResponses) {
+        private void displayQuotesListView(ArrayList<ResponseQuotes> retQuotesList) {
 
-            /**
-             *  ArrayList<String> symbolList = new ArrayList<String>();
+            //declare baseAdapter here
+            QuotesAdapter quotesAdapter = new QuotesAdapter(getApplication(), retQuotesList);
+            listViewQuotes.setAdapter(quotesAdapter);
 
-             if(s!=null || s.length()!=0){
+            //don't need to implement onClickListener
+        }
 
-             // Getting JSON Array node
-             JSONArray symbolJsonArray = null;
-             try {
-             symbolJsonArray = new JSONArray(s);
-             } catch (JSONException e) {
-             e.printStackTrace();
-             }
+        private ArrayList<String> putInJsonFormat(ArrayList<String> quoteResponses) {
 
-             JSONObject jsonObj = null;
+            String oneQuote;
 
-             for(int i=0; i<symbolJsonArray.length(); i++){
+            for(int j=0; j<quoteResponses.size(); j++){
+                oneQuote = quoteResponses.get(j);
 
-             try {
-             jsonObj = symbolJsonArray.getJSONObject(i);
-             } catch (JSONException e) {
-             e.printStackTrace();
-             }
+                //first part is everything in the first set of parentheses
+                String firstPart = oneQuote.substring(0, 17);
+                oneQuote = oneQuote.replace(firstPart, "");
+                oneQuote = oneQuote.replaceAll("[()]", ""); //reg exp for parentheses
 
-             if(jsonObj!=null){
-             try {
-             symbolList.add(jsonObj.getString(symbol));
-             } catch (JSONException e) {
-             e.printStackTrace();
-             }
-             }
-             }
+                Log.d("QuoteAsyncTask", "firstPart: " + firstPart);
+                Log.d("QuoteAsyncTask", "formatted quote: " + oneQuote);
 
-             }
+                quoteResponses.set(j, oneQuote);
 
-             for(int i=0; i<symbolList.size(); i++){
-             Log.d(MAINACT, "symbol at " + i + " : " + symbolList.get(i));
-             }
+                Log.d("QuoteAsyncTask", "quote response at " + j + ": " + quoteResponses.get(j));
 
-             return symbolList;
-             */
+            }
+
+            return quoteResponses;
+        }
+
+        //each of the elements in quoteResponses is a json object
+        private ArrayList<ResponseQuotes> parseJsonQuote(ArrayList<String> quoteResponses) {
 
             ArrayList<ResponseQuotes> quotesList = new ArrayList<>();
+
+            JSONObject jsonObject = null;
+            String errorString = "Request blockedExceeded requests/sec limit.";
+            String status, name, symbol, lastPrice, change, changePercent, timeStamp;
+            String msDate, marketCap, volume, changeYTD, changePercentYTD, high, low, open;
+
+            for(int j=0; j<quoteResponses.size(); j++) {
+
+                ResponseQuotes aResponseQuote = new ResponseQuotes();
+                boolean isJSONObject=false;
+
+                    try {
+
+                        jsonObject = new JSONObject(quoteResponses.get(j));
+                        isJSONObject=true;
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(isJSONObject) {
+                        try {
+
+                            status = jsonObject.getString("Status");
+                            aResponseQuote.setStatus(status);
+
+                            name = jsonObject.getString("Name");
+                            aResponseQuote.setName(name);
+                            symbol = jsonObject.getString("Symbol");
+                            aResponseQuote.setSymbol(symbol);
+                            lastPrice = jsonObject.getString("LastPrice");
+                            aResponseQuote.setLastPrice(lastPrice);
+                            change = jsonObject.getString("Change");
+                            aResponseQuote.setChange(change);
+                            changePercent = jsonObject.getString("ChangePercent");
+                            aResponseQuote.setChangePercent(changePercent);
+                            timeStamp = jsonObject.getString("Timestamp");
+                            aResponseQuote.setTimeStamp(timeStamp);
+                            msDate = jsonObject.getString("MSDate");
+                            aResponseQuote.setMsDate(msDate);
+                            marketCap = jsonObject.getString("MarketCap");
+                            aResponseQuote.setMarketCap(marketCap);
+                            volume = jsonObject.getString("Volume");
+                            aResponseQuote.setVolume(volume);
+                            changeYTD = jsonObject.getString("ChangeYTD");
+                            aResponseQuote.setChangeYTD(changeYTD);
+                            changePercentYTD = jsonObject.getString("ChangePercentYTD");
+                            aResponseQuote.setChangePercentYTD(changePercentYTD);
+                            high = jsonObject.getString("High");
+                            aResponseQuote.setHigh(high);
+                            low = jsonObject.getString("Low");
+                            aResponseQuote.setLow(low);
+                            open = jsonObject.getString("Open");
+                            aResponseQuote.setOpen(open);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else{
+                        aResponseQuote.setError(errorString);
+                    }
+
+                quotesList.add(j, aResponseQuote);
+
+            }
+
+            //verify if quotesList has all the data
+            for (int i=0; i<quotesList.size(); i++){
+                Log.d("ParseQuotes", "errorString: " + quotesList.get(i).getError());  //only exist if error code 501, ceeded limit
+                Log.d("ParseQuotes", "status: " + quotesList.get(i).getStatus());
+                Log.d("ParseQuotes", "name: " + quotesList.get(i).getName());
+                Log.d("ParseQuotes", "symbol: " + quotesList.get(i).getSymbol());
+                Log.d("ParseQuotes", "change: " + quotesList.get(i).getChange());
+                Log.d("ParseQuotes", "changePercent: " + quotesList.get(i).getChangePercent());
+                Log.d("ParseQuotes", "timeStamp: " + quotesList.get(i).getTimeStamp());
+                Log.d("ParseQuotes", " msDate: " + quotesList.get(i).getMsDate());
+                Log.d("ParseQuotes", "marketCap: " + quotesList.get(i).getMarketCap());
+                Log.d("ParseQuotes", "volume: " + quotesList.get(i).getVolume());
+                Log.d("ParseQuotes", "changeYTD: " + quotesList.get(i).getChangeYTD());
+                Log.d("ParseQuotes", "changePercentYTD: " + quotesList.get(i).getChangePercentYTD());
+                Log.d("ParseQuotes", "high: " + quotesList.get(i).getHigh());
+                Log.d("ParseQuotes", "low: " + quotesList.get(i).getLow());
+                Log.d("ParseQuotes", "open: " + quotesList.get(i).getOpen());
+
+            }
+
+            return quotesList;
         }
+
     }
 
 
@@ -301,6 +404,7 @@ public class MainActivity extends AppCompatActivity {
                  inputStream = conn.getErrorStream();
             }
             else{
+                //file not found for url here, on responseCode=501
                 inputStream = conn.getInputStream();
             }
 
@@ -318,12 +422,6 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
-           /* Log.d("Connect", conn.getErrorStream().toString());
-            try {
-                Log.d("Connect", conn.getResponseMessage().toString());
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }*/
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -333,8 +431,5 @@ public class MainActivity extends AppCompatActivity {
         return stringBuilder.toString();
 
     }
-
-
-
 
 }

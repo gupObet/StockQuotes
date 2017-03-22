@@ -5,139 +5,151 @@ package com.examples.jamiewong.stockquotes;
  */
 
 class ResponseQuotes {
-    private String Status;
-    private String Name;
-    private String Symbol;
-    private String LastPrice;
-    private String Change;
-    private String ChangePercent;
-    private String Timestamp;
-    private String MSDate;
-    private String MarketCap;
-    private String Volume;
-    private String ChangeYTD;
-    private String ChangePercentYTD;
-    private String High;
-    private String Low;
-    private String Open;
+    private String status;
+    private String name;
+    private String symbol;
+    private String lastPrice;
+    private String change;
+    private String changePercent;
+    private String timeStamp;
+    private String msDate;
+    private String marketCap;
+    private String volume;
+    private String changeYTD;
+    private String changePercentYTD;
+    private String high;
+    private String low;
+    private String open;
+
+
+
+    private String error;
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(String status) {
-        Status = status;
+        this.status = status;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getSymbol() {
-        return Symbol;
+        return symbol;
     }
 
     public void setSymbol(String symbol) {
-        Symbol = symbol;
+        this.symbol = symbol;
     }
 
     public String getLastPrice() {
-        return LastPrice;
+        return lastPrice;
     }
 
     public void setLastPrice(String lastPrice) {
-        LastPrice = lastPrice;
+        this.lastPrice = lastPrice;
     }
 
     public String getChange() {
-        return Change;
+        return change;
     }
 
     public void setChange(String change) {
-        Change = change;
+        this.change = change;
     }
 
     public String getChangePercent() {
-        return ChangePercent;
+        return changePercent;
     }
 
     public void setChangePercent(String changePercent) {
-        ChangePercent = changePercent;
+        this.changePercent = changePercent;
     }
 
-    public String getTimestamp() {
-        return Timestamp;
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setTimestamp(String timestamp) {
-        Timestamp = timestamp;
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
-    public String getMSDate() {
-        return MSDate;
+    public String getMsDate() {
+        return msDate;
     }
 
-    public void setMSDate(String MSDate) {
-        this.MSDate = MSDate;
+    public void setMsDate(String msDate) {
+        this.msDate = msDate;
     }
 
     public String getMarketCap() {
-        return MarketCap;
+        return marketCap;
     }
 
     public void setMarketCap(String marketCap) {
-        MarketCap = marketCap;
+        this.marketCap = marketCap;
     }
 
     public String getVolume() {
-        return Volume;
+        return volume;
     }
 
     public void setVolume(String volume) {
-        Volume = volume;
+        this.volume = volume;
     }
 
     public String getChangeYTD() {
-        return ChangeYTD;
+        return changeYTD;
     }
 
     public void setChangeYTD(String changeYTD) {
-        ChangeYTD = changeYTD;
+        this.changeYTD = changeYTD;
     }
 
     public String getChangePercentYTD() {
-        return ChangePercentYTD;
+        return changePercentYTD;
     }
 
     public void setChangePercentYTD(String changePercentYTD) {
-        ChangePercentYTD = changePercentYTD;
+        this.changePercentYTD = changePercentYTD;
     }
 
     public String getHigh() {
-        return High;
+        return high;
     }
 
     public void setHigh(String high) {
-        High = high;
+        this.high = high;
     }
 
     public String getLow() {
-        return Low;
+        return low;
     }
 
     public void setLow(String low) {
-        Low = low;
+        this.low = low;
     }
 
     public String getOpen() {
-        return Open;
+        return open;
     }
 
     public void setOpen(String open) {
-        Open = open;
+        this.open = open;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

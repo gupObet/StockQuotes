@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">StockQuotes</string>
     <string name="search_hint">Enter symbol or company name:</string>
+    <string name="stock_name">Name:</string>
+    <string name="last_price">LastPrice:</string>
+    <string name="time_stamp">Timestamp:</string>
+    <string name="high">High:</string>
+    <string name="low">Low:</string>
+    <string name="open">Open:</string>
 </resources>
