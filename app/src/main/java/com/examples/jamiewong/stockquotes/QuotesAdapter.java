@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ class QuotesAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if(view == null){
-            view = quotesInflator.inflate(R.layout.row_item, null);
+            view = quotesInflator.inflate(R.layout.quotes_row_item, null);
             holder = new ViewHolder();
             holder.tvName = (TextView) view.findViewById(R.id.tv_name);
             holder.tvSymbol = (TextView) view.findViewById(R.id.tv_symbol);
@@ -76,7 +75,7 @@ class QuotesAdapter extends BaseAdapter {
     }
 
 
-    static class ViewHolder{
+    class ViewHolder{
         TextView tvName;
         TextView tvSymbol;
         TextView tvLastPrice;
