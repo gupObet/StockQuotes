@@ -8,7 +8,12 @@
         android:layout_height="wrap_content"
         android:id="@+id/search_view"
         android:queryHint="@string/search_hint"
-        android:background="@drawable/background"/>
+        android:background="@drawable/background">
+
+    </SearchView>
+
+    <!--android:iconifiedByDefault="false"
+    <requestFocus/>-->
 
     <ListView
         android:layout_width="match_parent"

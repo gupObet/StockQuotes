@@ -1,5 +1,6 @@
 package com.examples.jamiewong.stockquotes;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.AbstractSequentialList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private FilterAdapter filterAdapter;
     private ArrayList<String> filterList;
     private QuoteAsyncTask quoteTask;
+    private ArrayList<String> retOneQuoteUrlArry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +80,13 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         //doesn't work
-        /*listViewFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 //String selSymOrName = (String) adapterView.getItemAtPosition(i);
+
+                retOneQuoteUrlArry = new ArrayList<>();
 
                 Toast.makeText(getApplicationContext(), "got lvFilter onItemClick", Toast.LENGTH_LONG).show();
 
@@ -90,23 +95,24 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplication(), "selected: " + selSymOrName, Toast.LENGTH_LONG).show();
 
                 String retOneQuoteUrl = createOneQuoteParam(selSymOrName);
-                retQuoteUrls.clear();
-                retQuoteUrls.add(retOneQuoteUrl);
+
+                retOneQuoteUrlArry.add(retOneQuoteUrl);
 
                 //not sure if I have to rename this bg task
                 quoteTask = new
-                        MainActivity.QuoteAsyncTask(retQuoteUrls);
+                        MainActivity.QuoteAsyncTask(retOneQuoteUrlArry);
 
                 quoteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+                listViewFilter.setVisibility(View.GONE);
+                listViewQuotes.setVisibility(View.VISIBLE);
+
             }
-        });*/
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-
-                listViewQuotes.setVisibility(View.VISIBLE);
 
                 Toast.makeText(getApplication(), s, Toast.LENGTH_LONG).show();
 
@@ -145,7 +151,10 @@ public class MainActivity extends AppCompatActivity {
                         });
 
                 bgTaskWebService.execute(urlParams);
+
                 listViewFilter.setVisibility(View.GONE);
+                listViewQuotes.setVisibility(View.VISIBLE);
+
 
                 return false;
             }
@@ -173,19 +182,22 @@ public class MainActivity extends AppCompatActivity {
                         //listViewFilter.setAdapter(null);
                     }
 
-                    listViewFilter.setVisibility(View.VISIBLE);
-                    listViewQuotes.setVisibility(View.GONE);
                     return false;
                 }
+
+                //this made it work
+                listViewFilter.setVisibility(View.VISIBLE);
+                listViewQuotes.setVisibility(View.GONE);
 
                 //only filter for queries size greater than 3, otherwise, too many results
                 if(s.length()>=3) {
 
                     filterAdapter.getFilter().filter(s);
 
+                    //filterAdapter.filter(s);
                     //Toast.makeText(getApplication(), "query >= 3", Toast.LENGTH_LONG).show();
                     //listViewFilter.invalidate();
-                    filterAdapter.notifyDataSetChanged();
+                    //filterAdapter.notifyDataSetChanged();
                 }
                 return false;
             }
@@ -232,12 +244,13 @@ public class MainActivity extends AppCompatActivity {
 
     private class QuoteAsyncTask extends AsyncTask<Void, List<ResponseQuotes>, Void> {
 
-        private final ArrayList<String> quoteUrls;
+        private ArrayList<String> quoteUrls;
         private boolean cancelTask;
 
         public QuoteAsyncTask(ArrayList<String> retQuoteUrls) {
             quoteUrls = retQuoteUrls;
         }
+
 
         @Override
         protected void onPreExecute() {

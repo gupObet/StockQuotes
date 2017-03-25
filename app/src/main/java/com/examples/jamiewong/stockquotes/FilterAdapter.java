@@ -21,8 +21,9 @@ import UtilityClasses.Util;
  * Created by jamiewong on 3/23/17.
  */
 
-class FilterAdapter extends BaseAdapter implements Filterable{
+class FilterAdapter extends BaseAdapter implements Filterable {
 
+    private static final String FILTERADAPTER = "FILTERADAPTER";
     private final Context mContext;
     protected ArrayList<String> mFilterList;
     private ValueFilter valueFilter;
@@ -59,7 +60,7 @@ class FilterAdapter extends BaseAdapter implements Filterable{
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
 
-        view = inflater.inflate(R.layout.filter_row_item, null);
+        /*view = inflater.inflate(R.layout.filter_row_item, null);
         tvSymbol=(TextView) view.findViewById(R.id.tv_filter_row);
         tvSymbol.setText(mFilterList.get(i));
 
@@ -68,9 +69,9 @@ class FilterAdapter extends BaseAdapter implements Filterable{
             public void onClick(View view) {
                 Toast.makeText(mContext, mFilterList.get(i) + " at: " + i, Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
 
-        /*ViewHolder viewHolder;
+        ViewHolder viewHolder;
 
         if(view==null){
             viewHolder = new ViewHolder();
@@ -85,12 +86,11 @@ class FilterAdapter extends BaseAdapter implements Filterable{
 
         viewHolder.tvSugSymbol.setText(mFilterList.get(i));
 
-        //TODO:
-
         Log.d("FilterClass", "getView at: " + i);
-        selectASymbol(view, i);*/
 
-       /* viewHolder.tvSugSymbol.setOnClickListener(new View.OnClickListener() {
+        /*selectASymbol(view, i);*/
+
+        /* viewHolder.tvSugSymbol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String selSym = ((TextView) view).getText().toString();
@@ -103,6 +103,7 @@ class FilterAdapter extends BaseAdapter implements Filterable{
 
         return view;
     }
+
 
    private void selectASymbol(View v, final int i) {
 
