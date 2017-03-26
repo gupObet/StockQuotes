@@ -20,9 +20,6 @@ class ResponseQuotes {
     private String high;
     private String low;
     private String open;
-
-
-
     private String error;
 
     public String getStatus() {

@@ -6,7 +6,7 @@ package com.examples.jamiewong.stockquotes;
 
 public interface OnEventListener<T> {
     public void onSuccess(T object);
-
-    public void onFailure(/*Exception e*/String errorMessage);
+    public void onFailure(T object);
+    //public void onFailure(/*Exception e*/int errorMessage);
 }
 

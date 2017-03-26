@@ -62,7 +62,14 @@ class QuotesAdapter extends BaseAdapter {
             holder= (ViewHolder) view.getTag();
         }
 
-        holder.tvSymbol.setText("Symbol: " + quotesList.get(i).getSymbol());
+        if(quotesList.get(i).getError()!=null) {  //error code has been set for this case
+            holder.tvSymbol.setText("Symbol: " + quotesList.get(i).getSymbol() + "\n" +
+            "connection error code: " + quotesList.get(i).getError());
+        }
+        else {
+            holder.tvSymbol.setText("Symbol: " + quotesList.get(i).getSymbol());
+        }
+
         holder.tvName.setText("Name: "  + quotesList.get(i).getName());
         holder.tvLastPrice.setText("LastPrice: " + quotesList.get(i).getLastPrice());
         holder.tvTimestamp.setText("Timestamp: " + quotesList.get(i).getTimeStamp());
@@ -70,7 +77,6 @@ class QuotesAdapter extends BaseAdapter {
         holder.tvLow.setText("Low: " + quotesList.get(i).getLow());
         holder.tvOpen.setText("Open: " + quotesList.get(i).getOpen());
 
-        //return null;
         return view;
     }
 

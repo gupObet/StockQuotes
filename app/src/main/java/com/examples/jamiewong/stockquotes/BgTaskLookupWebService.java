@@ -10,7 +10,7 @@ import android.widget.Toast;
  */
 
 
-class BgTaskWebService extends AsyncTask<String, Void, String> {
+class BgTaskLookupWebService extends AsyncTask<String, Void, String> {
 
     private OnEventListener<String> mCallback;
     private final String BGTWS = getClass().getSimpleName();
@@ -18,7 +18,7 @@ class BgTaskWebService extends AsyncTask<String, Void, String> {
     private String responseString;
     private WebConnect webAccess;
 
-    public BgTaskWebService(Context context, OnEventListener callback) {
+    public BgTaskLookupWebService(Context context, OnEventListener callback) {
         mContest = context;
         mCallback=callback;
     }
@@ -46,7 +46,8 @@ class BgTaskWebService extends AsyncTask<String, Void, String> {
                 mCallback.onSuccess(s);
             }
             else {
-                mCallback.onFailure("connection error: connection exceeded per second");
+                //501, number of connections exceeded per second
+                mCallback.onFailure(String.valueOf(webAccess.getResponseCode()));
             }
         }
     }

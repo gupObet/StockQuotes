@@ -1,6 +1,5 @@
 package com.examples.jamiewong.stockquotes;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,26 +11,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.AbstractSequentialList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import UtilityClasses.AppConstants;
 import UtilityClasses.Util;
 
 /**
- * Todo:  check network online or not
- * questions: repeat quote symbols should be removed?
- * fix the 501 case, for ex. GERN for lookup on GE, string cannot be converted to jsonObject, increasing
- * wait time on connect to webservice should fix it, but don't want user to wait too long
- * Uses asynctask thread pool executor to download asynchronously all the quotes
+ * Please see the attached readme for documentation
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progBar;
     List<ResponseQuotes> quotesList;
     private QuotesAdapter quotesAdapter;
-    private ImageView closeButton;
     private ListView listViewFilter;
     private FilterAdapter filterAdapter;
     private ArrayList<String> filterList;
@@ -84,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                //String selSymOrName = (String) adapterView.getItemAtPosition(i);
-
                 retOneQuoteUrlArry = new ArrayList<>();
 
                 Toast.makeText(getApplicationContext(), "got lvFilter onItemClick", Toast.LENGTH_LONG).show();
@@ -98,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
                 retOneQuoteUrlArry.add(retOneQuoteUrl);
 
-                //not sure if I have to rename this bg task
                 quoteTask = new
                         MainActivity.QuoteAsyncTask(retOneQuoteUrlArry);
 
@@ -118,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String urlParams = Util.createLookupParams(s);
 
-                BgTaskWebService bgTaskWebService = new BgTaskWebService(getApplicationContext(),
+                BgTaskLookupWebService bgTaskWebService = new BgTaskLookupWebService(getApplicationContext(),
                         new OnEventListener() {
                             @Override
                             public void onSuccess(Object object) {
@@ -143,8 +129,9 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onFailure(String errorMessage) {
-                                Toast.makeText(getApplicationContext(), "ERROR: " + errorMessage,
+                            public void onFailure(Object object) {
+                                int errorCode = (int) object;
+                                Toast.makeText(getApplicationContext(), "ERROR: " + errorCode,
                                         Toast.LENGTH_LONG).show();
                             }
 
@@ -191,13 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //only filter for queries size greater than 3, otherwise, too many results
                 if(s.length()>=3) {
-
                     filterAdapter.getFilter().filter(s);
-
-                    //filterAdapter.filter(s);
-                    //Toast.makeText(getApplication(), "query >= 3", Toast.LENGTH_LONG).show();
-                    //listViewFilter.invalidate();
-                    //filterAdapter.notifyDataSetChanged();
                 }
                 return false;
             }
@@ -234,9 +215,6 @@ public class MainActivity extends AppCompatActivity {
             oneQuoteUrl = createOneQuoteParam(selSymbol);
 
             quoteUrls.add(oneQuoteUrl);
-
-            /*sb = new StringBuilder(QUOTE_API_BASE + OUT_QUOTE_JSON + selSymbol);
-            quoteUrls.add(sb.toString());*/
         }
         return quoteUrls;
     }
@@ -273,26 +251,54 @@ public class MainActivity extends AppCompatActivity {
 
 
             String aJSONFormQuote;
-            ResponseQuotes oneResponseQuote;
+            ResponseQuotes oneResponseQuote = null;
+            String responseString, currentQuote;
+            int responseCode = 0;
 
             for (int i = 0; i < quoteUrls.size(); i++) {
 
                 if(cancelTask==false) {
 
-                    String responseString = new WebConnect().connect(quoteUrls.get(i));
+                    WebConnect webConnect = new WebConnect();
+
+                    currentQuote = quoteUrls.get(i);
+
+                    responseString = webConnect.connect(currentQuote);
+
+                    /*get response code, if 501 or any error code that is not 200,
+                    tr  connect again after one x sec*/
+                    if(webConnect.getResponseCode()!=200){
+
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        responseString = webConnect.connect(currentQuote);
+                        responseCode = webConnect.getResponseCode();
+                        Log.d(MAINACT, "second attempt to reconnect for same url");
+                        Log.d(MAINACT, "reconnect response code: " + responseCode);
+
+                        if(responseCode!=200){
+                            String firstPart = currentQuote.substring(0, currentQuote.indexOf("=")+1);
+                            currentQuote=currentQuote.replace(firstPart, "");
+                        }
+
+                    }
 
                     aJSONFormQuote = putInJsonFormat(responseString);
+                    oneResponseQuote = parseJsonQuote(aJSONFormQuote, responseCode, currentQuote);
 
-                    oneResponseQuote = parseJsonQuote(aJSONFormQuote);
 
                     try {
-                        Thread.sleep(6000);  //5000 would still have some 501 response codes which is a failure
+                        //5000 would still have some 501 response codes which is a failure
+                        Thread.sleep(6000);
                     } catch (InterruptedException exception) {
                         exception.printStackTrace();
                     }
 
                     quotesList.add(oneResponseQuote);
-                    Log.d("MainActivity", "Requesting " + quoteUrls.get(i));
+                    Log.d("MainActivity", "Requesting " + currentQuote);
 
                     //update UI
                     publishProgress(quotesList);
@@ -322,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             return oneQuote;
         }
 
-        private ResponseQuotes parseJsonQuote(/*ArrayList<String> quoteResponses*/String aJSONFormQuote) {
+        private ResponseQuotes parseJsonQuote(String aJSONFormQuote, int responseCode, String currentQuote) {
 
             JSONObject jsonObject = null;
             String errorString = "Request blockedExceeded requests/sec limit.";
@@ -340,6 +346,8 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (JSONException e) {
                 e.printStackTrace();
+
+                aResponseQuote.setError(responseCode + " for " + currentQuote.toString());
             }
 
             if (isJSONObject) {
@@ -381,9 +389,8 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            } else {
-                aResponseQuote.setError(errorString);
             }
+
             return aResponseQuote;
         }
     }
