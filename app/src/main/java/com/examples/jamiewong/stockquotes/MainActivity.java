@@ -17,6 +17,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import UtilityClasses.AppConstants;
 import UtilityClasses.Util;
 
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String QUOTE_API_BASE = "http://dev.markitondemand.com/Api/v2/Quote";
     private static final String OUT_QUOTE_JSON = "/jsonp?symbol=";
     private final String MAINACT = getClass().getSimpleName();
+    private static boolean cancelTask = false;
     private SearchView searchView;
     private ArrayList<String> retSymbolList;
     private ArrayList<String> retQuoteUrls;
@@ -151,14 +154,17 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(s)) {
                     Toast.makeText(getApplication(), "clicked on X", Toast.LENGTH_LONG).show();
 
+
                     if(quotesAdapter!=null) {
+
+                        if(quoteTask!=null){
+                            quoteTask.cancel(true);
+                            quoteTask.cancelTask();
+                        }
+
                         quotesList.clear();
                         quotesAdapter.notifyDataSetChanged();
                         //listViewQuotes.setAdapter(null);
-
-                        if(quoteTask!=null){
-                            quoteTask.cancelTask();
-                        }
                     }
 
                     //also clear the filter listview
@@ -223,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
     private class QuoteAsyncTask extends AsyncTask<Void, List<ResponseQuotes>, Void> {
 
         private ArrayList<String> quoteUrls;
-        private boolean cancelTask;
 
         public QuoteAsyncTask(ArrayList<String> retQuoteUrls) {
             quoteUrls = retQuoteUrls;
@@ -242,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        public void cancelTask() {
+        public synchronized void cancelTask() {
             cancelTask=true;
         }
 
@@ -257,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < quoteUrls.size(); i++) {
 
-                if(cancelTask==false) {
+                if (cancelTask == false) {
 
                     WebConnect webConnect = new WebConnect();
 
@@ -267,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
 
                     /*get response code, if 501 or any error code that is not 200,
                     tr  connect again after one x sec*/
-                    if(webConnect.getResponseCode()!=200){
+                    if (webConnect.getResponseCode() != 200) {
 
                         try {
                             Thread.sleep(2000);
@@ -279,9 +284,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(MAINACT, "second attempt to reconnect for same url");
                         Log.d(MAINACT, "reconnect response code: " + responseCode);
 
-                        if(responseCode!=200){
-                            String firstPart = currentQuote.substring(0, currentQuote.indexOf("=")+1);
-                            currentQuote=currentQuote.replace(firstPart, "");
+                        if (responseCode != 200) {
+                            String firstPart = currentQuote.substring(0, currentQuote.indexOf("=") + 1);
+                            currentQuote = currentQuote.replace(firstPart, "");
                         }
 
                     }
@@ -295,6 +300,11 @@ public class MainActivity extends AppCompatActivity {
                         Thread.sleep(6000);
                     } catch (InterruptedException exception) {
                         exception.printStackTrace();
+                    }
+
+                    if (cancelTask == true) {
+                        Log.d(MAINACT, "cancelTask: " + cancelTask);
+                        break;
                     }
 
                     quotesList.add(oneResponseQuote);
@@ -315,6 +325,9 @@ public class MainActivity extends AppCompatActivity {
 
             List<ResponseQuotes> updatedQuotesList = values[0];
 
+            /*if(cancelTask==true){
+                quotesList.clear();
+            }*/
             quotesAdapter.notifyDataSetChanged();
         }
 
