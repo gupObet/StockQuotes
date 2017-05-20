@@ -8,8 +8,6 @@ import android.widget.Toast;
 /**
  * Created by jamiewong on 3/23/17.
  */
-
-
 class BgTaskLookupWebService extends AsyncTask<String, Void, String> {
 
     private OnEventListener<String> mCallback;
@@ -38,7 +36,6 @@ class BgTaskLookupWebService extends AsyncTask<String, Void, String> {
         super.onPostExecute(s);
 
         Toast.makeText(mContest, s, Toast.LENGTH_LONG).show();
-
         Log.d(BGTWS, s);
 
         if(mCallback!=null){
