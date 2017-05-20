@@ -1,14 +1,12 @@
 package com.examples.jamiewong.stockquotes;
 
 import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 
 /**
  * Created by jamiewong on 3/23/17.
@@ -22,7 +20,6 @@ public class WebConnect {
     private IOException myException;
     int responseCode;
 
-
     /*class SymbolResults {
         private String symbolResponse;
         private IOException e;
@@ -33,14 +30,12 @@ public class WebConnect {
 
         InputStream inputStream;
         try {
-
             Log.d(WEBCONNECT, "url param: " + urlParams);
             URL url = new URL(urlParams);
 
             conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(1000);
             conn.setDoOutput(false);  //makes a big difference
-
             responseCode = conn.getResponseCode();
             Log.d(WEBCONNECT, "conn.getRespnseCode: " + responseCode);
 
@@ -52,7 +47,6 @@ public class WebConnect {
             }
 
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
             //BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -78,7 +72,6 @@ public class WebConnect {
         return symbolResults;*/
 
         return stringBuilder.toString();
-
     }
 
     protected int getResponseCode(){
