@@ -58,11 +58,9 @@ public class MainActivity extends AppCompatActivity {
         listViewQuotes = (ListView) findViewById(R.id.lv_quotes);
         listViewFilter = (ListView) findViewById(R.id.lv_filter);
         progBar = (ProgressBar) findViewById(R.id.progBar);
-
         filterList = new ArrayList<>();
         filterAdapter = new FilterAdapter(getApplicationContext(), filterList);
         listViewFilter.setAdapter(filterAdapter);
-
         quotesList = Collections.synchronizedList(new ArrayList<ResponseQuotes>());
 
     }
@@ -75,22 +73,15 @@ public class MainActivity extends AppCompatActivity {
         listViewFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                 retOneQuoteUrlArry = new ArrayList<>();
-
                 Toast.makeText(getApplicationContext(), "got lvFilter onItemClick", Toast.LENGTH_LONG).show();
-
                 String selSymOrName = filterAdapter.getItem(i);
-
                 Toast.makeText(getApplication(), "selected: " + selSymOrName, Toast.LENGTH_LONG).show();
-
                 String retOneQuoteUrl = createOneQuoteParam(selSymOrName);
-
                 retOneQuoteUrlArry.add(retOneQuoteUrl);
 
                 quoteTask = new
                         MainActivity.QuoteAsyncTask(retOneQuoteUrlArry);
-
                 quoteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
                 listViewFilter.setVisibility(View.GONE);
@@ -102,9 +93,7 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-
                 Toast.makeText(getApplication(), s, Toast.LENGTH_LONG).show();
-
                 String urlParams = Util.createLookupParams(s);
 
                 BgTaskLookupWebService bgTaskWebService = new BgTaskLookupWebService(getApplicationContext(),
@@ -117,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
                                         Toast.LENGTH_LONG).show();
 
                                 retSymbolList = Util.parseJsonLookup(symbolsString, AppConstants.STOCK_SYMBOL);
-
                                 retQuoteUrls = createQuoteParams(retSymbolList);
 
                                 for (int i = 0; i < retQuoteUrls.size(); i++) {
@@ -127,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
                                 //create a thread pool asynctask
                                 quoteTask = new
                                         MainActivity.QuoteAsyncTask(retQuoteUrls);
-
                                 quoteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             }
 
@@ -141,10 +128,8 @@ public class MainActivity extends AppCompatActivity {
                         });
 
                 bgTaskWebService.execute(urlParams);
-
                 listViewFilter.setVisibility(View.GONE);
                 listViewQuotes.setVisibility(View.VISIBLE);
-
 
                 return false;
             }
@@ -154,9 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(s)) {
                     Toast.makeText(getApplication(), "clicked on X", Toast.LENGTH_LONG).show();
 
-
                     if(quotesAdapter!=null) {
-
                         if(quoteTask!=null){
                             quoteTask.cancel(true);
                             quoteTask.cancelTask();
@@ -189,17 +172,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
-
     }
 
     private String createOneQuoteParam(String selSymbol) {
 
         StringBuilder sb;
-
         sb = new StringBuilder(QUOTE_API_BASE + OUT_QUOTE_JSON + selSymbol);
-
         return sb.toString();
     }
 
@@ -211,20 +189,15 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> createQuoteParams(ArrayList<String> retSymbolList) {
 
         ArrayList<String> quoteUrls = new ArrayList<>();
-
         String selSymbol, oneQuoteUrl;
 
         for (int i = 0; i < retSymbolList.size(); i++) {
-
             selSymbol = retSymbolList.get(i);
-
             oneQuoteUrl = createOneQuoteParam(selSymbol);
-
             quoteUrls.add(oneQuoteUrl);
         }
         return quoteUrls;
     }
-
 
     private class QuoteAsyncTask extends AsyncTask<Void, List<ResponseQuotes>, Void> {
 
@@ -234,17 +207,14 @@ public class MainActivity extends AppCompatActivity {
             quoteUrls = retQuoteUrls;
         }
 
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
             //progBar.setVisibility(View.VISIBLE);
-
             quotesAdapter = new QuotesAdapter(getApplication(), quotesList);
             listViewQuotes.setAdapter(quotesAdapter);
             cancelTask=false;
-
         }
 
         public synchronized void cancelTask() {
@@ -254,26 +224,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
 
-
             String aJSONFormQuote;
             ResponseQuotes oneResponseQuote = null;
             String responseString, currentQuote;
             int responseCode = 0;
 
             for (int i = 0; i < quoteUrls.size(); i++) {
-
                 if (cancelTask == false) {
-
                     WebConnect webConnect = new WebConnect();
-
                     currentQuote = quoteUrls.get(i);
-
                     responseString = webConnect.connect(currentQuote);
 
                     /*get response code, if 501 or any error code that is not 200,
                     tr  connect again after one x sec*/
                     if (webConnect.getResponseCode() != 200) {
-
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException e) {
@@ -288,12 +252,10 @@ public class MainActivity extends AppCompatActivity {
                             String firstPart = currentQuote.substring(0, currentQuote.indexOf("=") + 1);
                             currentQuote = currentQuote.replace(firstPart, "");
                         }
-
                     }
 
                     aJSONFormQuote = putInJsonFormat(responseString);
                     oneResponseQuote = parseJsonQuote(aJSONFormQuote, responseCode, currentQuote);
-
 
                     try {
                         //5000 would still have some 501 response codes which is a failure
@@ -306,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(MAINACT, "cancelTask: " + cancelTask);
                         break;
                     }
-
                     quotesList.add(oneResponseQuote);
                     Log.d("MainActivity", "Requesting " + currentQuote);
 
@@ -314,7 +275,6 @@ public class MainActivity extends AppCompatActivity {
                     publishProgress(quotesList);
                 }
             }
-
             //return quoteResponses;
             return null;
         }
@@ -324,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate();
 
             List<ResponseQuotes> updatedQuotesList = values[0];
-
             /*if(cancelTask==true){
                 quotesList.clear();
             }*/
@@ -348,18 +307,15 @@ public class MainActivity extends AppCompatActivity {
             String status, name, symbol, lastPrice, change, changePercent, timeStamp;
             String msDate, marketCap, volume, changeYTD, changePercentYTD, high, low, open;
 
-
             ResponseQuotes aResponseQuote = new ResponseQuotes();
             boolean isJSONObject = false;
 
             try {
-
                 jsonObject = new JSONObject(aJSONFormQuote);
                 isJSONObject = true;
 
             } catch (JSONException e) {
                 e.printStackTrace();
-
                 aResponseQuote.setError(responseCode + " for " + currentQuote.toString());
             }
 
@@ -368,7 +324,6 @@ public class MainActivity extends AppCompatActivity {
 
                     status = jsonObject.getString("Status");
                     aResponseQuote.setStatus(status);
-
                     name = jsonObject.getString("Name");
                     aResponseQuote.setName(name);
                     symbol = jsonObject.getString("Symbol");
@@ -398,7 +353,6 @@ public class MainActivity extends AppCompatActivity {
                     open = jsonObject.getString("Open");
                     aResponseQuote.setOpen(open);
 
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -407,6 +361,5 @@ public class MainActivity extends AppCompatActivity {
             return aResponseQuote;
         }
     }
-
 
 }
