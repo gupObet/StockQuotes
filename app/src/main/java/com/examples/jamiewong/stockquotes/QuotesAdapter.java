@@ -15,7 +15,6 @@ import java.util.List;
 
 class QuotesAdapter extends BaseAdapter {
 
-
     private final LayoutInflater quotesInflator;
     private final List<ResponseQuotes> quotesList;
     //private final ArrayList<ResponseQuotes> quotesList;
@@ -79,7 +78,6 @@ class QuotesAdapter extends BaseAdapter {
 
         return view;
     }
-
 
     class ViewHolder{
         TextView tvName;
