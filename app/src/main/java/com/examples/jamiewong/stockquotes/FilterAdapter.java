@@ -25,7 +25,6 @@ class FilterAdapter extends BaseAdapter implements Filterable {
     private ValueFilter valueFilter;
     private LayoutInflater inflater;
 
-
     public FilterAdapter(Context applicationContext, ArrayList<String> filterList) {
         mContext = applicationContext;
         mFilterList=filterList;
@@ -59,7 +58,6 @@ class FilterAdapter extends BaseAdapter implements Filterable {
         if(view==null){
             viewHolder = new ViewHolder();
             view = inflater.inflate(R.layout.filter_row_item, null);
-
             viewHolder.tvSugSymbol = (TextView) view.findViewById(R.id.tv_filter_row);
             view.setTag(viewHolder);
         }
@@ -68,7 +66,6 @@ class FilterAdapter extends BaseAdapter implements Filterable {
         }
 
         viewHolder.tvSugSymbol.setText(mFilterList.get(i));
-
         Log.d("FilterClass", "getView at: " + i);
 
         return view;
@@ -77,11 +74,9 @@ class FilterAdapter extends BaseAdapter implements Filterable {
 
     @Override
     public Filter getFilter() {
-
         if(valueFilter == null){
             valueFilter = new ValueFilter();
         }
-
         return valueFilter;
     }
 
@@ -112,14 +107,12 @@ class FilterAdapter extends BaseAdapter implements Filterable {
             filterResults.count=mFilterList.size();
 
             return filterResults;
-
         }
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-
             notifyDataSetChanged();
-
+            
             /*if(filterResults != null && filterResults.count > 0) {
                 notifyDataSetChanged();
             }
