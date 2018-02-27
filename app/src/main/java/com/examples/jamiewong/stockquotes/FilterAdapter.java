@@ -9,7 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+
 import java.util.ArrayList;
+
 import UtilityClasses.AppConstants;
 import UtilityClasses.Util;
 
@@ -27,7 +29,7 @@ class FilterAdapter extends BaseAdapter implements Filterable {
 
     public FilterAdapter(Context applicationContext, ArrayList<String> filterList) {
         mContext = applicationContext;
-        mFilterList=filterList;
+        mFilterList = filterList;
         inflater = LayoutInflater.from(mContext);
     }
 
@@ -55,14 +57,13 @@ class FilterAdapter extends BaseAdapter implements Filterable {
 
         ViewHolder viewHolder;
 
-        if(view==null){
+        if (view == null) {
             viewHolder = new ViewHolder();
             view = inflater.inflate(R.layout.filter_row_item, null);
             viewHolder.tvSugSymbol = (TextView) view.findViewById(R.id.tv_filter_row);
             view.setTag(viewHolder);
-        }
-        else {
-            viewHolder= (ViewHolder) view.getTag();
+        } else {
+            viewHolder = (ViewHolder) view.getTag();
         }
 
         viewHolder.tvSugSymbol.setText(mFilterList.get(i));
@@ -71,16 +72,15 @@ class FilterAdapter extends BaseAdapter implements Filterable {
         return view;
     }
 
-
     @Override
     public Filter getFilter() {
-        if(valueFilter == null){
+        if (valueFilter == null) {
             valueFilter = new ValueFilter();
         }
         return valueFilter;
     }
 
-    private class ValueFilter extends Filter{
+    private class ValueFilter extends Filter {
 
         private final String FILTERCLASS = getClass().getSimpleName();
 
@@ -90,21 +90,21 @@ class FilterAdapter extends BaseAdapter implements Filterable {
             FilterResults filterResults = new FilterResults();
             //create urlParams for lookup string
             String filterUrlParam = Util.createLookupParams(constraint.toString());
-            Log.d(FILTERCLASS, "filter url params: " + filterUrlParam );
+            Log.d(FILTERCLASS, "filter url params: " + filterUrlParam);
 
-            if(constraint!=null && constraint.length()>0){
+            if (constraint != null && constraint.length() > 0) {
 
                 WebConnect webConnect = new WebConnect();
                 String lookupResults = webConnect.connect(filterUrlParam);
                 int responseCode = webConnect.getResponseCode();
 
-                if(responseCode==200){
-                    mFilterList=Util.parseJsonLookup(lookupResults, AppConstants.STOCK_SYMBOL);
+                if (responseCode == 200) {
+                    mFilterList = Util.parseJsonLookup(lookupResults, AppConstants.STOCK_SYMBOL);
                 }
             }
 
-            filterResults.values=mFilterList;
-            filterResults.count=mFilterList.size();
+            filterResults.values = mFilterList;
+            filterResults.count = mFilterList.size();
 
             return filterResults;
         }

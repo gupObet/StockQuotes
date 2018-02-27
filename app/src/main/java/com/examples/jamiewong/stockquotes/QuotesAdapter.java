@@ -20,7 +20,7 @@ class QuotesAdapter extends BaseAdapter {
     //private final ArrayList<ResponseQuotes> quotesList;
 
     public QuotesAdapter(Context context, List<ResponseQuotes> retQuotesList) {
-        quotesList=retQuotesList;
+        quotesList = retQuotesList;
         quotesInflator = LayoutInflater.from(context);
     }
 
@@ -44,7 +44,7 @@ class QuotesAdapter extends BaseAdapter {
 
         ViewHolder holder;
 
-        if(view == null){
+        if (view == null) {
             view = quotesInflator.inflate(R.layout.quotes_row_item, null);
             holder = new ViewHolder();
             holder.tvName = (TextView) view.findViewById(R.id.tv_name);
@@ -56,20 +56,18 @@ class QuotesAdapter extends BaseAdapter {
             holder.tvOpen = (TextView) view.findViewById(R.id.tv_open);
 
             view.setTag(holder);
-        }
-        else{
-            holder= (ViewHolder) view.getTag();
+        } else {
+            holder = (ViewHolder) view.getTag();
         }
 
-        if(quotesList.get(i).getError()!=null) {  //error code has been set for this case
+        if (quotesList.get(i).getError() != null) {  //error code has been set for this case
             holder.tvSymbol.setText("Symbol: " + quotesList.get(i).getSymbol() + "\n" +
-            "connection error code: " + quotesList.get(i).getError());
-        }
-        else {
+                    "connection error code: " + quotesList.get(i).getError());
+        } else {
             holder.tvSymbol.setText("Symbol: " + quotesList.get(i).getSymbol());
         }
 
-        holder.tvName.setText("Name: "  + quotesList.get(i).getName());
+        holder.tvName.setText("Name: " + quotesList.get(i).getName());
         holder.tvLastPrice.setText("LastPrice: " + quotesList.get(i).getLastPrice());
         holder.tvTimestamp.setText("Timestamp: " + quotesList.get(i).getTimeStamp());
         holder.tvHigh.setText("High: " + quotesList.get(i).getHigh());
@@ -79,7 +77,7 @@ class QuotesAdapter extends BaseAdapter {
         return view;
     }
 
-    class ViewHolder{
+    class ViewHolder {
         TextView tvName;
         TextView tvSymbol;
         TextView tvLastPrice;

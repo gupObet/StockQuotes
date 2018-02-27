@@ -1,8 +1,11 @@
 package UtilityClasses;
+
 import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -14,10 +17,10 @@ public class Util {
     private static String UTIL = "Util";
 
     public static String createLookupParams(String s) {
-        
+
         StringBuilder sb = new StringBuilder(AppConstants.LOOKUP_API_BASE + AppConstants.OUT_LOOKUP_JSON + s);
         return sb.toString();
-        
+
     }
 
     public static ArrayList<String> parseJsonLookup(String s, String symbol) {

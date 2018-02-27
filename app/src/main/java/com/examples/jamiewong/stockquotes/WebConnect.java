@@ -1,6 +1,7 @@
 package com.examples.jamiewong.stockquotes;
 
 import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,7 +75,7 @@ public class WebConnect {
         return stringBuilder.toString();
     }
 
-    protected int getResponseCode(){
+    protected int getResponseCode() {
         return responseCode;
     }
 }

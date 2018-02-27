@@ -18,7 +18,7 @@ class BgTaskLookupWebService extends AsyncTask<String, Void, String> {
 
     public BgTaskLookupWebService(Context context, OnEventListener callback) {
         mContest = context;
-        mCallback=callback;
+        mCallback = callback;
     }
 
     @Override
@@ -26,7 +26,7 @@ class BgTaskLookupWebService extends AsyncTask<String, Void, String> {
 
         String urlParams = params[0]; //urlParams;
         webAccess = new WebConnect();
-        responseString=webAccess.connect(urlParams);
+        responseString = webAccess.connect(urlParams);
 
         return responseString;
     }
@@ -38,11 +38,10 @@ class BgTaskLookupWebService extends AsyncTask<String, Void, String> {
         Toast.makeText(mContest, s, Toast.LENGTH_LONG).show();
         Log.d(BGTWS, s);
 
-        if(mCallback!=null){
-            if(webAccess.getResponseCode()==200) {
+        if (mCallback != null) {
+            if (webAccess.getResponseCode() == 200) {
                 mCallback.onSuccess(s);
-            }
-            else {
+            } else {
                 //501, number of connections exceeded per second
                 mCallback.onFailure(String.valueOf(webAccess.getResponseCode()));
             }

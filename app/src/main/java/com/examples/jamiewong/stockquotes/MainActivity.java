@@ -12,8 +12,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -139,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(s)) {
                     Toast.makeText(getApplication(), "clicked on X", Toast.LENGTH_LONG).show();
 
-                    if(quotesAdapter!=null) {
-                        if(quoteTask!=null){
+                    if (quotesAdapter != null) {
+                        if (quoteTask != null) {
                             quoteTask.cancel(true);
                             quoteTask.cancelTask();
                         }
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     //also clear the filter listview
-                    if(filterAdapter!=null) {
+                    if (filterAdapter != null) {
                         filterAdapter.mFilterList.clear();
                         //filterList.clear();
                         filterAdapter.notifyDataSetChanged();
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 listViewQuotes.setVisibility(View.GONE);
 
                 //only filter for queries size greater than 3, otherwise, too many results
-                if(s.length()>=3) {
+                if (s.length() >= 3) {
                     filterAdapter.getFilter().filter(s);
                 }
                 return false;
@@ -214,11 +216,11 @@ public class MainActivity extends AppCompatActivity {
             //progBar.setVisibility(View.VISIBLE);
             quotesAdapter = new QuotesAdapter(getApplication(), quotesList);
             listViewQuotes.setAdapter(quotesAdapter);
-            cancelTask=false;
+            cancelTask = false;
         }
 
         public synchronized void cancelTask() {
-            cancelTask=true;
+            cancelTask = true;
         }
 
         @Override
