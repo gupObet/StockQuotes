@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplication(), "selected: " + selSymOrName, Toast.LENGTH_LONG).show();
                 String retOneQuoteUrl = createOneQuoteParam(selSymOrName);
                 retOneQuoteUrlArry.add(retOneQuoteUrl);
-
                 quoteTask = new
                         MainActivity.QuoteAsyncTask(retOneQuoteUrlArry);
                 quoteTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
